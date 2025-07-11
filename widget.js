@@ -3,8 +3,8 @@
   const WIDGET_ID = "elipedia-chat-widget";
   const IFRAME_ID = "elipedia-chat-iframe";
   const BUTTON_ID = "elipedia-chat-toggle";
-  const MODAL_ID = "elipedia-login-modal";
   const TOKEN_KEY = "elipedia_jwt_token";
+  const FORM_ACTION = "https://dev.elipedia.id/login/callback"; // URL untuk mengirim data login
 
   // Styles
   const IFRAME_STYLE = `
@@ -38,59 +38,124 @@
     user-select: none;
   `;
 
-  const MODAL_STYLE = `
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 100000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  `;
-  const MODAL_CONTENT_STYLE = `
-    background: #fff;
-    border-radius: 10px;
-    padding: 32px 24px 24px 24px;
-    min-width: 320px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.2);
-    position: relative;
-  `;
-  const CLOSE_BTN_STYLE = `
-    position: absolute;
-    top: 8px;
-    right: 12px;
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-  `;
+  const FLOAT_CONTAINER_ID = "elipedia-floating-container";
 
   function isLoggedIn() {
     return !!localStorage.getItem(TOKEN_KEY);
   }
 
-  function createIframe() {
-    if (document.getElementById(IFRAME_ID)) return;
-    const iframe = document.createElement("iframe");
-    iframe.id = IFRAME_ID;
-    iframe.src = CHAT_URL;
-    iframe.style.cssText = IFRAME_STYLE;
-    iframe.setAttribute("title", "Elipedia Chat");
-    document.body.appendChild(iframe);
+  function isWidgetVisible() {
+    return document.getElementById(FLOAT_CONTAINER_ID) !== null;
   }
 
-  function showIframe() {
+  function hideWidget() {
+    const float = document.getElementById(FLOAT_CONTAINER_ID);
+    if (float) float.remove();
+  }
+
+  function showWidgetContainer() {
+    let float = document.getElementById(FLOAT_CONTAINER_ID);
+    if (!float) {
+      float = document.createElement("div");
+      float.id = FLOAT_CONTAINER_ID;
+      float.style.position = "fixed";
+      float.style.bottom = "80px";
+      float.style.right = "20px";
+      float.style.width = "350px";
+      float.style.height = "500px";
+      float.style.zIndex = "99999";
+      float.style.display = "flex";
+      float.style.alignItems = "center";
+      float.style.justifyContent = "center";
+      float.style.background = "none";
+      float.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
+      float.style.borderRadius = "10px";
+      float.style.padding = "0";
+      document.body.appendChild(float);
+    }
+    return float;
+  }
+
+  function showLoginInWidget() {
+    const float = showWidgetContainer();
+    float.innerHTML = `
+      <div style="background:#fff;border-radius:10px;padding:24px 16px;max-width:100%;width:100%;height:100%;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:Arial,sans-serif;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+        <h3 style="margin-top:0;margin-bottom:1.5rem;font-size:1.25rem;font-weight:600;text-align:center;color:#166534;">Login ke Elipedia Chat</h3>
+        <form id="elipedia-login-form" autocomplete="off" style="display:flex;flex-direction:column;gap:1rem;width:100%;">
+          <label style="font-size:.95rem;font-weight:500;color:#222;width:100%;">Email
+            <input type="email" name="email" required style="font-size:14px;border-radius:6px;line-height:1.5;padding:5px 10px;border:2px solid #dee1e2;color:rgb(14,14,16);background:#dee1e2;display:block;height:32px;width:100%;margin-top:0.25rem;">
+          </label>
+          <label style="font-size:.95rem;font-weight:500;color:#222;width:100%;">Nama
+            <input type="text" name="name" required style="font-size:14px;border-radius:6px;line-height:1.5;padding:5px 10px;border:2px solid #dee1e2;color:rgb(14,14,16);background:#dee1e2;display:block;height:32px;width:100%;margin-top:0.25rem;">
+          </label>
+          <label style="font-size:.95rem;font-weight:500;color:#222;width:100%;">Username
+            <input type="text" name="username" required style="font-size:14px;border-radius:6px;line-height:1.5;padding:5px 10px;border:2px solid #dee1e2;color:rgb(14,14,16);background:#dee1e2;display:block;height:32px;width:100%;margin-top:0.25rem;">
+          </label>
+          <button type="submit" style="margin-top:.5rem;width:100%;background:linear-gradient(90deg,#166534,#22c55e);color:#fff;padding:.75rem 0;border:none;border-radius:.5rem;font-size:1.1rem;font-weight:600;box-shadow:0 2px 8px rgba(34,197,94,0.08);transition:background .2s,box-shadow .2s;cursor:pointer;">Login</button>
+        </form>
+      </div>
+    `;
+    const form = document.getElementById("elipedia-login-form");
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      const email = this.email.value;
+      const name = this.name.value;
+      const username = this.username.value;
+      const data = {
+        email,
+        preferred_username: username,
+        name,
+        sub: window.btoa(email),
+      };
+      localStorage.setItem(
+        "elipedia_x_data",
+        window.btoa(JSON.stringify(data))
+      );
+      // Redirect ke login callback (seperti form lama)
+      const tempForm = document.createElement("form");
+      tempForm.action = FORM_ACTION;
+      tempForm.target = "elipedia_login_popup";
+      tempForm.method = "GET";
+      tempForm.style.display = "none";
+      tempForm.innerHTML = `
+        <input type="text" name="verify_token" value="UcmkbFpIPjSyLdCxcXDJCesgzCAPauzSn5IgSFivkq" />
+        <input type="text" name="fromRedirect" value="true" />
+        <input type="text" name="x-data" value="${window.btoa(
+          JSON.stringify(data)
+        )}" />
+        <input type="text" name="widget" value="true" />
+      `;
+      document.body.appendChild(tempForm);
+      const popup = window.open(
+        "",
+        "elipedia_login_popup",
+        "width=500,height=700"
+      );
+      tempForm.submit();
+      const pollTimer = setInterval(function () {
+        if (popup.closed) {
+          clearInterval(pollTimer);
+          localStorage.setItem(TOKEN_KEY, "dummy_token");
+          // Setelah login, kosongkan container, iframe hanya muncul jika user klik toggle lagi
+          hideWidget();
+        }
+      }, 500);
+    };
+  }
+
+  function showIframeInWidget() {
+    const float = showWidgetContainer();
+    float.innerHTML = "";
     let iframe = document.getElementById(IFRAME_ID);
     if (!iframe) {
-      createIframe();
-      iframe = document.getElementById(IFRAME_ID);
+      iframe = document.createElement("iframe");
+      iframe.id = IFRAME_ID;
+      iframe.src = CHAT_URL;
+      iframe.style.cssText =
+        IFRAME_STYLE + "position:static;display:block;width:100%;height:100%;";
+      iframe.setAttribute("title", "Elipedia Chat");
     }
-    iframe.style.display = "block";
-  }
-
-  function hideIframe() {
-    const iframe = document.getElementById(IFRAME_ID);
-    if (iframe) iframe.style.display = "none";
+    float.appendChild(iframe);
   }
 
   function createButton() {
@@ -103,105 +168,22 @@
     button.title = "Buka Chat Elipedia";
 
     button.addEventListener("click", () => {
-      if (isLoggedIn()) {
-        const iframe = document.getElementById(IFRAME_ID);
-        if (iframe.style.display === "none") {
-          showIframe();
-        } else {
-          hideIframe();
-        }
+      if (isWidgetVisible()) {
+        hideWidget();
       } else {
-        showLoginModal();
+        if (isLoggedIn()) {
+          showIframeInWidget();
+        } else {
+          showLoginInWidget();
+        }
       }
     });
 
     document.body.appendChild(button);
   }
 
-  function showLoginModal() {
-    if (document.getElementById(MODAL_ID)) return;
-    const modal = document.createElement("div");
-    modal.id = MODAL_ID;
-    modal.style.cssText = MODAL_STYLE;
-    modal.innerHTML = `
-      <div style="${MODAL_CONTENT_STYLE}">
-        <button id="elipedia-modal-close" style="${CLOSE_BTN_STYLE}" title="Tutup">&times;</button>
-        <h3 style="margin-top:0">Login ke Elipedia Chat</h3>
-        <form id="elipedia-login-form">
-          <label>Email:<br><input type="email" name="email" required style="width:100%;margin-bottom:8px"></label><br>
-          <label>Nama:<br><input type="text" name="name" required style="width:100%;margin-bottom:8px"></label><br>
-          <label>Username:<br><input type="text" name="username" required style="width:100%;margin-bottom:16px"></label><br>
-          <button type="submit" style="width:100%;background:rgb(21 111 39);color:#fff;padding:8px 0;border:none;border-radius:5px;font-size:16px;">Login</button>
-        </form>
-      </div>
-    `;
-    document.body.appendChild(modal);
-
-    document.getElementById("elipedia-modal-close").onclick = function () {
-      modal.remove();
-    };
-
-    document.getElementById("elipedia-login-form").onsubmit = function (e) {
-      e.preventDefault();
-      const email = this.email.value;
-      const name = this.name.value;
-      const username = this.username.value;
-      // Simpan data ke localStorage (atau bisa juga encode dan kirim ke backend)
-      const data = {
-        email,
-        preferred_username: username,
-        name,
-        sub: window.btoa(email),
-      };
-      // Simpan x-data ke localStorage (untuk kebutuhan lain)
-      localStorage.setItem(
-        "elipedia_x_data",
-        window.btoa(JSON.stringify(data))
-      );
-      // Redirect ke login callback (seperti form lama)
-      const form = document.createElement("form");
-      form.action = "https://dev.elipedia.id/login/callback";
-      form.target = "elipedia_login_popup";
-      form.method = "GET";
-      form.style.display = "none";
-      form.innerHTML = `
-        <input type="text" name="verify_token" value="UcmkbFpIPjSyLdCxcXDJCesgzCAPauzSn5IgSFivkq" />
-        <input type="text" name="fromRedirect" value="true" />
-        <input type="text" name="x-data" value="${window.btoa(
-          JSON.stringify(data)
-        )}" />
-        <input type="text" name="widget" value="true" />
-      `;
-      document.body.appendChild(form);
-      // Buka popup login
-      const popup = window.open(
-        "",
-        "elipedia_login_popup",
-        "width=500,height=700"
-      );
-      form.submit();
-      // Polling untuk cek apakah popup sudah tertutup
-      const pollTimer = setInterval(function () {
-        if (popup.closed) {
-          clearInterval(pollTimer);
-          // Anggap token sudah tersimpan di localStorage oleh backend setelah login
-          // Untuk demo, kita simpan token dummy
-          localStorage.setItem(TOKEN_KEY, "dummy_token");
-          modal.remove();
-          location.reload();
-        }
-      }, 500);
-    };
-  }
-
   function initWidget() {
-    const container = document.getElementById(WIDGET_ID);
-    if (!container) {
-      console.error(`[Elipedia Chat] Element with id #${WIDGET_ID} not found.`);
-      return;
-    }
-    createIframe();
-    hideIframe();
+    // Tidak perlu cek container widget utama lagi
     createButton();
   }
 
