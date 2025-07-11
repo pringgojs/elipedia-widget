@@ -24,10 +24,10 @@
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    background-color: rgb(21 111 39);
+    background-color: none;
     color: white;
     font-size: 24px;
     text-align: center;
@@ -97,7 +97,8 @@
     if (document.getElementById(BUTTON_ID)) return;
     const button = document.createElement("div");
     button.id = BUTTON_ID;
-    button.innerHTML = "💬";
+    button.innerHTML =
+      "<img src='icon.png' alt='Elipedia Chat' style='width: 100%; height: 100%; object-fit: cover;'>";
     button.style.cssText = BUTTON_STYLE;
     button.title = "Buka Chat Elipedia";
 
