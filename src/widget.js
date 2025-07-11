@@ -1,4 +1,4 @@
-((function () {
+(function () {
   const CHAT_URL = "https://dev.elipedia.id/";
   const IFRAME_ID = "elipedia-chat-iframe";
   const BUTTON_ID = "elipedia-chat-toggle";
