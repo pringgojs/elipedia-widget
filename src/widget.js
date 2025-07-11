@@ -161,7 +161,7 @@
     const button = document.createElement("div");
     button.id = BUTTON_ID;
     button.innerHTML =
-      "<img src='icon.png' alt='Elipedia Chat' style='width: 100%; height: 100%; object-fit: cover;'>";
+      "<img src='../icon.png' alt='Elipedia Chat' style='width: 100%; height: 100%; object-fit: cover;'>";
     button.style.cssText = BUTTON_STYLE;
     button.title = "Buka Chat Elipedia";
 
