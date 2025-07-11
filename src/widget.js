@@ -1,6 +1,5 @@
-(function () {
+((function () {
   const CHAT_URL = "https://dev.elipedia.id/";
-  const WIDGET_ID = "elipedia-chat-widget";
   const IFRAME_ID = "elipedia-chat-iframe";
   const BUTTON_ID = "elipedia-chat-toggle";
   const TOKEN_KEY = "elipedia_jwt_token";
