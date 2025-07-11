@@ -1,0 +1,14 @@
+{
+  "name": "elipedia-widget",
+  "version": "1.0.0",
+  "description": "Widget chat Elipedia untuk website.",
+  "main": "src/widget.js",
+  "scripts": {
+    "build": "terser src/widget.js -o widget.min.js --compress --mangle"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "terser": "^5.30.0"
+  }
+}
