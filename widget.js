@@ -61,7 +61,7 @@
       document.body.appendChild(float);
     }
     float.style.position = "fixed";
-    float.style.bottom = "120px"; // Tambah jarak dari bawah agar tidak menutupi tombol
+    float.style.bottom = height == "500px" ? "80px" : "120px"; // Tambah jarak dari bawah agar tidak menutupi tombol
     float.style.right = "20px";
     float.style.width = "350px";
     float.style.height = height;
