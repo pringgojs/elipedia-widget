@@ -53,47 +53,45 @@
     if (float) float.remove();
   }
 
-  function showWidgetContainer() {
+  function showWidgetContainer(height = "500px") {
     let float = document.getElementById(FLOAT_CONTAINER_ID);
     if (!float) {
       float = document.createElement("div");
       float.id = FLOAT_CONTAINER_ID;
-      float.style.position = "fixed";
-      float.style.bottom = "80px";
-      float.style.right = "20px";
-      float.style.width = "350px";
-      float.style.height = "500px";
-      float.style.zIndex = "99999";
-      float.style.display = "flex";
-      float.style.alignItems = "center";
-      float.style.justifyContent = "center";
-      float.style.background = "none";
-      float.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
-      float.style.borderRadius = "10px";
-      float.style.padding = "0";
       document.body.appendChild(float);
     }
+    float.style.position = "fixed";
+    float.style.bottom = "120px"; // Tambah jarak dari bawah agar tidak menutupi tombol
+    float.style.right = "20px";
+    float.style.width = "350px";
+    float.style.height = height;
+    float.style.zIndex = "99999";
+    float.style.display = "flex";
+    float.style.alignItems = "center";
+    float.style.justifyContent = "center";
+    float.style.background = "none";
+    float.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
+    float.style.borderRadius = "10px";
+    float.style.padding = "0";
     return float;
   }
 
   function showLoginInWidget() {
-    const float = showWidgetContainer();
+    const float = showWidgetContainer("340px");
     float.innerHTML = `
-      <div style="background:#fff;border-radius:10px;padding:24px 16px;max-width:100%;width:100%;height:100%;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:Arial,sans-serif;display:flex;flex-direction:column;justify-content:center;align-items:center;">
-        <h3 style="margin-top:0;margin-bottom:1.5rem;font-size:1.25rem;font-weight:600;text-align:center;color:#166534;">Login ke Elipedia Chat</h3>
-        <form id="elipedia-login-form" autocomplete="off" style="display:flex;flex-direction:column;gap:1rem;width:100%;">
-          <label style="font-size:.95rem;font-weight:500;color:#222;width:100%;">Email
-            <input type="email" name="email" required style="font-size:14px;border-radius:6px;line-height:1.5;padding:5px 10px;border:2px solid #dee1e2;color:rgb(14,14,16);background:#dee1e2;display:block;height:32px;width:100%;margin-top:0.25rem;">
-          </label>
-          <label style="font-size:.95rem;font-weight:500;color:#222;width:100%;">Nama
-            <input type="text" name="name" required style="font-size:14px;border-radius:6px;line-height:1.5;padding:5px 10px;border:2px solid #dee1e2;color:rgb(14,14,16);background:#dee1e2;display:block;height:32px;width:100%;margin-top:0.25rem;">
-          </label>
-          <label style="font-size:.95rem;font-weight:500;color:#222;width:100%;">Username
-            <input type="text" name="username" required style="font-size:14px;border-radius:6px;line-height:1.5;padding:5px 10px;border:2px solid #dee1e2;color:rgb(14,14,16);background:#dee1e2;display:block;height:32px;width:100%;margin-top:0.25rem;">
-          </label>
-          <button type="submit" style="margin-top:.5rem;width:100%;background:linear-gradient(90deg,#166534,#22c55e);color:#fff;padding:.75rem 0;border:none;border-radius:.5rem;font-size:1.1rem;font-weight:600;box-shadow:0 2px 8px rgba(34,197,94,0.08);transition:background .2s,box-shadow .2s;cursor:pointer;">Login</button>
-        </form>
-      </div>
+      <form id="elipedia-login-form" autocomplete="off" style="background:#fff;border-radius:10px;padding:32px 24px 32px 24px;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-family:Arial,sans-serif;display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%;height:100%;gap:1.2rem;max-width:320px;">
+        <h3 style="margin:0 0 1.5rem 0;font-size:1.25rem;font-weight:600;text-align:center;color:#166534;width:100%;">Login ke Elipedia Chat</h3>
+        <label style="font-size:.95rem;font-weight:500;color:#222;width:100%;padding-bottom:2px;">Email
+          <input type="email" name="email" value="jodhy.hermawan@elitery.com" required style="font-size:14px;border-radius:6px;line-height:1.5;padding:8px 12px;border:2px solid #dee1e2;color:rgb(14,14,16);background:#dee1e2;display:block;height:38px;width:100%;margin-top:0.25rem;box-sizing:border-box;">
+        </label>
+        <label style="font-size:.95rem;font-weight:500;color:#222;width:100%;padding-bottom:2px;">Nama
+          <input type="text" name="name" value="jodhy" required style="font-size:14px;border-radius:6px;line-height:1.5;padding:8px 12px;border:2px solid #dee1e2;color:rgb(14,14,16);background:#dee1e2;display:block;height:38px;width:100%;margin-top:0.25rem;box-sizing:border-box;">
+        </label>
+        <label style="font-size:.95rem;font-weight:500;color:#222;width:100%;padding-bottom:2px;">Username
+          <input type="text" name="username" value="jodhy12" required style="font-size:14px;border-radius:6px;line-height:1.5;padding:8px 12px;border:2px solid #dee1e2;color:rgb(14,14,16);background:#dee1e2;display:block;height:38px;width:100%;margin-top:0.25rem;box-sizing:border-box;">
+        </label>
+        <button type="submit" style="margin-top:.5rem;width:100%;background:linear-gradient(90deg,#166534,#22c55e);color:#fff;padding:.85rem 0;border:none;border-radius:.5rem;font-size:1.1rem;font-weight:600;box-shadow:0 2px 8px rgba(34,197,94,0.08);transition:background .2s,box-shadow .2s;cursor:pointer;">Login</button>
+      </form>
     `;
     const form = document.getElementById("elipedia-login-form");
     form.onsubmit = function (e) {
@@ -144,7 +142,7 @@
   }
 
   function showIframeInWidget() {
-    const float = showWidgetContainer();
+    const float = showWidgetContainer("500px");
     float.innerHTML = "";
     let iframe = document.getElementById(IFRAME_ID);
     if (!iframe) {
