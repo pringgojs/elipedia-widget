@@ -40,25 +40,12 @@
   const FLOAT_CONTAINER_ID = "elipedia-floating-container";
 
   async function isLoggedIn() {
+    const token = localStorage.getItem(TOKEN_KEY ?? "dummy_token");
     try {
-      // Get sessionId from API
-      const sessionRes = await fetch(
-        "https://dev.elipedia.id/api/get-session",
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-
-      console.log("Session response:", !sessionRes.ok);
-      if (!sessionRes.ok) return false;
-      const sessionData = await sessionRes.json();
-      if (!sessionData.sessionId) return false;
-
       // Check session active status
       const checkRes = await fetch(
-        `https://dev.elipedia.id/api/check-session/${sessionData.sessionId}`,
-        { method: "GET", credentials: "include" }
+        `https://dev.elipedia.id/api/check-session/${token}`,
+        { method: "GET" }
       );
       if (!checkRes.ok) return false;
       const checkData = await checkRes.json();
@@ -68,8 +55,6 @@
       return false;
     }
   }
-  // return !!localStorage.getItem(TOKEN_KEY);
-  // }
 
   function isWidgetVisible() {
     return document.getElementById(FLOAT_CONTAINER_ID) !== null;
@@ -126,16 +111,20 @@
       const email = this.email.value;
       const name = this.name.value;
       const username = this.username.value;
+      const authId = window.btoa(email + ":" + new Date().getTime());
       const data = {
         email,
         preferred_username: username,
         name,
         sub: window.btoa(email),
+        authId,
       };
       localStorage.setItem(
         "elipedia_x_data",
         window.btoa(JSON.stringify(data))
       );
+      localStorage.setItem(TOKEN_KEY, authId);
+
       // Redirect ke login callback (seperti form lama)
       const tempForm = document.createElement("form");
       tempForm.action = FORM_ACTION;
@@ -160,8 +149,6 @@
       const pollTimer = setInterval(function () {
         if (popup.closed) {
           clearInterval(pollTimer);
-          // localStorage.setItem(TOKEN_KEY, "dummy_token");
-          // Setelah login, kosongkan container, iframe hanya muncul jika user klik toggle lagi
           hideWidget();
         }
       }, 500);
@@ -178,7 +165,6 @@
       iframe.src = CHAT_URL;
       iframe.style.cssText =
         IFRAME_STYLE + "position:static;display:block;width:100%;height:100%;";
-      iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
       iframe.setAttribute("title", "Elipedia Chat");
     }
     float.appendChild(iframe);
