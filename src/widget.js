@@ -39,9 +39,37 @@
 
   const FLOAT_CONTAINER_ID = "elipedia-floating-container";
 
-  function isLoggedIn() {
-    return !!localStorage.getItem(TOKEN_KEY);
+  async function isLoggedIn() {
+    try {
+      // Get sessionId from API
+      const sessionRes = await fetch(
+        "https://dev.elipedia.id/api/get-session",
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+
+      console.log("Session response:", !sessionRes.ok);
+      if (!sessionRes.ok) return false;
+      const sessionData = await sessionRes.json();
+      if (!sessionData.sessionId) return false;
+
+      // Check session active status
+      const checkRes = await fetch(
+        `https://dev.elipedia.id/api/check-session/${sessionData.sessionId}`,
+        { method: "GET", credentials: "include" }
+      );
+      if (!checkRes.ok) return false;
+      const checkData = await checkRes.json();
+      console.log("Check session active:", checkData);
+      return !!checkData.active;
+    } catch (e) {
+      return false;
+    }
   }
+  // return !!localStorage.getItem(TOKEN_KEY);
+  // }
 
   function isWidgetVisible() {
     return document.getElementById(FLOAT_CONTAINER_ID) !== null;
@@ -132,7 +160,7 @@
       const pollTimer = setInterval(function () {
         if (popup.closed) {
           clearInterval(pollTimer);
-          localStorage.setItem(TOKEN_KEY, "dummy_token");
+          // localStorage.setItem(TOKEN_KEY, "dummy_token");
           // Setelah login, kosongkan container, iframe hanya muncul jika user klik toggle lagi
           hideWidget();
         }
@@ -150,6 +178,7 @@
       iframe.src = CHAT_URL;
       iframe.style.cssText =
         IFRAME_STYLE + "position:static;display:block;width:100%;height:100%;";
+      iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
       iframe.setAttribute("title", "Elipedia Chat");
     }
     float.appendChild(iframe);
@@ -165,14 +194,27 @@
     button.title = "Buka Chat Elipedia";
 
     button.addEventListener("click", () => {
+      console.log("Widget Elipedia Chat akan segera hadir!");
       if (isWidgetVisible()) {
         hideWidget();
       } else {
-        if (isLoggedIn()) {
-          showIframeInWidget();
-        } else {
-          showLoginInWidget();
-        }
+        console.log("isLoggedIn()", isLoggedIn());
+        isLoggedIn().then((loggedIn) => {
+          if (loggedIn) {
+            console.log("User sudah login, menampilkan iframe...");
+            showIframeInWidget();
+          } else {
+            console.log("User belum login, menampilkan form login...");
+            showLoginInWidget();
+          }
+        });
+        // if (isLoggedIn()) {
+        //   console.log("User sudah login, menampilkan iframe...");
+        //   showIframeInWidget();
+        // } else {
+        //   console.log("User belum login, menampilkan form login...");
+        //   showLoginInWidget();
+        // }
       }
     });
 
