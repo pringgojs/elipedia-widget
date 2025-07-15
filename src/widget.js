@@ -38,7 +38,29 @@
   `;
 
   const FLOAT_CONTAINER_ID = "elipedia-floating-container";
+  let loginPollInterval = null;
 
+  function startLoginPolling() {
+    if (loginPollInterval) return;
+    loginPollInterval = setInterval(async () => {
+      const loggedIn = await isLoggedIn();
+      if (!loggedIn) {
+        // Jika belum login, tampilkan form login di container
+        if (!isWidgetVisible()) {
+          showWidgetContainer("340px");
+        }
+        showLoginInWidget();
+        console.log("Polling: User belum login, menampilkan form login...");
+      }
+    }, 10000);
+  }
+
+  function stopLoginPolling() {
+    if (loginPollInterval) {
+      clearInterval(loginPollInterval);
+      loginPollInterval = null;
+    }
+  }
   async function isLoggedIn() {
     const token = localStorage.getItem(TOKEN_KEY ?? "dummy_token");
     try {
@@ -210,6 +232,7 @@
   function initWidget() {
     // Tidak perlu cek container widget utama lagi
     createButton();
+    startLoginPolling();
   }
 
   // Jalankan ketika DOM siap
